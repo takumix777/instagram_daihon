@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WOODY HOUSE Reel Script Builder</title>
+<style>
+:root{--ink:#1d211d;--muted:#697068;--bg:#f4f1e9;--panel:#fff;--line:#ddd9cd;--brand:#203d31;--soft:#edf2ed;--warn:#fff2d9}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif;color:var(--ink);background:var(--bg)}
+header{padding:26px 24px 18px;background:var(--brand);color:white}header h1{margin:0;font-size:25px}header p{margin:7px 0 0;opacity:.84;font-size:13px}
+main{max-width:1320px;margin:0 auto;padding:20px;display:grid;grid-template-columns:400px 1fr;gap:18px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 4px 18px rgba(0,0,0,.03)}
+h2{font-size:16px;margin:0 0 13px}h3{font-size:14px;margin:16px 0 9px}
+label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff;font:inherit;color:inherit}
+textarea{min-height:82px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 13px;font-weight:800;cursor:pointer;background:#e8e8e2;color:var(--ink)}
+button.primary{background:var(--brand);color:white;width:100%;font-size:15px;padding:14px}
+button.secondary{background:#e9eee9}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{width:auto}
+.muted{font-size:12px;color:var(--muted);line-height:1.6}.tiny{font-size:11px;color:var(--muted)}
+.source{border:1px solid var(--line);border-radius:12px;padding:11px;margin:8px 0;display:flex;gap:9px;align-items:flex-start}
+.source input{width:auto;margin-top:3px}.source b{font-size:12px}.source p{margin:4px 0 0;font-size:11px;color:var(--muted);line-height:1.45}
+.badge{display:inline-block;font-size:10px;padding:3px 6px;border-radius:999px;background:var(--soft);margin-right:5px}.warn{background:var(--warn)}
+.tabs{display:flex;gap:5px;overflow:auto;margin-bottom:14px}.tab{white-space:nowrap}.tab.active{background:var(--brand);color:white}
+.pane{display:none}.pane.active{display:block}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top;text-align:left}th{background:#f3f3ef;position:sticky;top:0}
+.cut{font-weight:800;width:46px}.role{color:var(--muted);font-size:11px}
+.box{background:#f5f6f2;border-radius:12px;padding:13px;white-space:pre-wrap;line-height:1.65;font-size:12px}
+.verify{background:var(--warn);border-radius:12px;padding:12px;font-size:12px;line-height:1.6}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:var(--soft);padding:7px 10px;border-radius:9px;font-size:11px}
+.refrow{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}.refrow:last-child{border:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>WOODY HOUSE Reel Script Builder</h1>
+  <p>過去台本＝「伝え方」、Q&A・公式HP＝「事実」。テーマを入れて、リール台本のたたき台を半自動作成。</p>
+</header>
+<main>
+<aside>
+  <div class="card">
+    <h2>台本を作る</h2>
+    <label>テーマ *</label>
+    <input id="theme" placeholder="例：土地探しで失敗しないために">
+    <label>今回必ず入れたい内容</label>
+    <textarea id="must" placeholder="例：土地が決まる前でも相談できる／現地調査で日当たりや法規制も見る"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label>ターゲット</label><select id="target"><option>家づくり初心者</option><option>土地探し中</option><option>住宅ローンが不安</option><option>会社比較中</option><option>モデルハウス検討中</option><option>既存オーナー</option></select></div>
+      <div><label>動画尺</label><select id="duration"><option value="15">約30秒</option><option value="18" selected>約40秒</option><option value="22">約50〜60秒</option></select></div>
+    </div>
+    <label>見せ方</label>
+    <select id="angle">
+      <option value="auto">おまかせ</option><option value="qa">Q&A型</option><option value="avoid">失敗回避型</option>
+      <option value="contrast">常識・思い込み反転型</option><option value="check">チェックリスト型</option>
+      <option value="story">ストーリー型</option><option value="pro">プロ解説型</option>
+    </select>
+    <label>撮影できる素材</label>
+    <input id="assets" placeholder="例：モデルハウス、スタッフ、地図、PC、カタログ">
+    <label>締め方</label>
+    <select id="cta"><option value="none">CTAなし</option><option value="soft" selected>自然な相談誘導</option><option value="profile">プロフィール誘導</option><option value="next">次回予告</option></select>
+    <div class="actions"><button class="secondary" onclick="autoPick()">参考情報を自動選択</button></div>
+    <button class="primary" onclick="generate()">台本を作成</button>
+    <p class="tiny">※ 数値・保証・補助金・価格・エリアなどの変動情報は「要確認」を表示します。</p>
+  </div>
+
+  <div class="card">
+    <h2>参考にする会社情報</h2>
+    <div id="knowledgePick"><p class="muted">テーマを入力して「参考情報を自動選択」を押してください。</p></div>
+  </div>
+  <div class="card">
+    <h2>参考にする過去台本</h2>
+    <div id="pastPick"><p class="muted">テーマに近い過去台本を自動選択します。</p></div>
+  </div>
+</aside>
+
+<section>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-tab="result">完成台本</button>
+      <button class="tab" data-tab="refs">参照情報</button>
+      <button class="tab" data-tab="ai">AIで仕上げる</button>
+      <button class="tab" data-tab="db">資料DB</button>
+    </div>
+    <div id="result" class="pane active"><div class="empty">左側にテーマを入れて「台本を作成」を押してください。</div></div>
+    <div id="refs" class="pane"><div class="empty">まだ参照情報はありません。</div></div>
+    <div id="ai" class="pane"><div class="empty">台本を作成すると、ChatGPT / Claudeへ渡せる仕上げ用プロンプトが出ます。</div></div>
+    <div id="db" class="pane"></div>
+  </div>
+</section>
+</main>
+<script>
+const KB=[
+{id:'brand1',cat:'会社・ブランド',title:'人生をカッコよくする会社',text:'家という箱を売るだけでなく、住む人の個性やライフスタイル、その先の人生まで見つめ、唯一無二の暮らしを提案する。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'brand2',cat:'会社・ブランド',title:'フルオーダーメイドの家づくり',text:'神栖市を中心に茨城県南東部から千葉県北東部で、フルオーダーメイドの家づくりを手掛ける。インテリア・エクステリアのデザイン力を強みとしている。',source:'公式HP',url:'https://woody-house.com/about-us/',verified:true},
+{id:'point1',cat:'会社・ブランド',title:'家づくり5つのポイント',text:'ワンストップ、プランニング、品質・価格、構造・性能、アフターメンテナンスの5つを家づくりのポイントとして掲げている。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'one1',cat:'相談・サポート',title:'ワンストップ対応',text:'土地探し、設計、ローン計画、内装、外構、火災保険の見直し、入居後の確定申告など住まいに関わるプロセスを一貫してサポートする。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'plan1',cat:'設計・デザイン',title:'潜在的な要望まで探るプランニング',text:'要望をそのまま形にするだけでなく、本人もまだ気づいていない潜在的な要望に光を当て、価値観やライフスタイルを汲み取ったプランを提案する。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'quality1',cat:'品質・価格',title:'材木商ルーツと価格提案',text:'材木商からスタートした建築会社として、材木屋のルーツと独自ネットワークを活かし、素材選定から施工までの一貫体制でデザイン性とコストパフォーマンスの両立を目指す。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'perf1',cat:'性能',title:'耐震等級3',text:'公式サイトでは全棟で耐震等級3を実現するとしている。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'perf2',cat:'性能',title:'長期優良住宅',text:'公式サイトでは、長期優良住宅認定を受けた設計を標準としている旨が記載されている。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'perf3',cat:'性能',title:'断熱性能 UA値0.46',text:'公式サイトでは断熱性能としてUA値0.46を掲げ、省エネで快適な住環境を目指している。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true,verify:true},
+{id:'after1',cat:'保証・メンテ',title:'24時間365日アフター受付',text:'定期点検・アフターメンテナンス専用LINEで24時間365日受付としている。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true},
+{id:'after2',cat:'保証・メンテ',title:'定期巡回・定期点検',text:'公式サイトでは引渡し後2年間で3回の定期巡回サービス、その後5年ごとの定期点検サービスを案内している。30年目まで無償、以降有償との記載。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true,verify:true},
+{id:'after3',cat:'保証・メンテ',title:'最長30年保証',text:'公式サイトの家づくり5つのポイントで最長30年保証を掲げている。保証条件は投稿前に最新内容を確認する。',source:'公式HP',url:'https://woody-house.com/concept/',verified:true,verify:true},
+{id:'faq1',cat:'相談・サポート',title:'インテリアだけの相談も可能',text:'他社で建てた住宅でも、家具・照明・色使いなどインテリアのみの相談を受け付け、必要に応じて現地調査も行うとしている。',source:'公式HP',url:'https://woody-house.com/faq/',verified:true},
+{id:'faq2',cat:'会社・ブランド',title:'他社との違い',text:'唯一無二のデザインに加え、性能と価格とのバランスを重視し、単なる高スペック競争ではなく暮らしを豊かにする住まいを提案する考え方。',source:'公式HP',url:'https://woody-house.com/faq/',verified:true},
+{id:'area1',cat:'相談・サポート',title:'主なサービスエリア',text:'茨城県は神栖市・鹿嶋市・潮来市・行方市・鉾田市、千葉県は香取市・東庄町・銚子市・旭市・匝瑳市を掲載。エリア外も対応可能な場合あり。',source:'公式HP',url:'https://woody-house.com/',verified:true,verify:true},
+{id:'consult1',cat:'相談・サポート',title:'家づくり相談窓口',text:'間取り、お金、土地など家づくりに関する相談を受け付け、来場、資料請求、訪問、プラン作成、オンライン相談などの窓口がある。',source:'公式HP',url:'https://woody-house.com/inquiries/',verified:true},
+{id:'model1',cat:'モデルハウス',title:'横瀬まちかどモデルハウス',text:'公式サイトでは神栖市横瀬で30坪・3LDKの平屋モデルハウス「Brend in.」を2026年10月オープン予定として案内している。',source:'公式HP',url:'https://woody-house.com/modelhouse02/',verified:true,verify:true},
+{id:'model2',cat:'モデルハウス',title:'本社モデルハウスの世界観',text:'サントリーニ島をイメージした、非日常・リゾート感のあるモデルハウスとして紹介されている。',source:'公式HP',url:'https://woody-house.com/',verified:true},
+{id:'show1',cat:'設計・デザイン',title:'多様なインテリアスタイル',text:'ショールームではオリエンタル、フレンチアンティーク、北欧系など複数のインテリア世界観を体感できる。',source:'公式HP',url:'https://woody-house.com/showroom/',verified:true},
+{id:'int1',cat:'設計・デザイン',title:'写真のコピーではなく自由設計',text:'参考写真をそのままコピーするのではなく、一人ひとりの好みやライフスタイルに合わせてプロが設計・デザインを支援する。',source:'社内資料',verified:false},
+{id:'int2',cat:'設計・デザイン',title:'図面だけで伝わらない不安を減らす',text:'図面だけでは分かりにくいスケール感や完成イメージについて、プラン・イメージ提案を通してサポートする。',source:'社内資料',verified:false},
+{id:'loan1',cat:'住宅ローン',title:'住宅ローン相談',text:'提携金融機関の紹介やライフプラン、返済シミュレーションなど、資金計画を含めた相談に対応する。',source:'社内資料',verified:false},
+{id:'loan2',cat:'住宅ローン',title:'単身でも住宅ローンは検討可能',text:'単身であることだけを理由に住宅ローンが不利になるとは限らず、審査は個別条件による。',source:'社内資料',verified:false},
+{id:'loan3',cat:'住宅ローン',title:'他の借入がある場合',text:'他の借入があっても住宅ローンを検討できる場合はあるが、審査では返済比率など全体状況を見る。',source:'社内資料',verified:false,verify:true},
+{id:'land1',cat:'土地',title:'土地探しから相談できる',text:'希望エリア・予算を整理しながら土地情報を提案し、建築会社目線で希望の建物が建つか、地盤、日当たりなども確認する。',source:'社内資料',verified:false},
+{id:'land2',cat:'土地',title:'土地が決まる前でも相談可能',text:'土地がまだ決まっていない段階から相談でき、候補地の情報整理や家づくりとの両立を支援する。',source:'社内資料',verified:false},
+{id:'land3',cat:'土地',title:'現地調査で見ること',text:'土地形状、高低差、道路、上下水道・ガス、日当たり、周辺環境、法規制などを確認し、希望する家が建てられるか判断する材料にする。',source:'社内資料',verified:false},
+{id:'maint1',cat:'保証・メンテ',title:'将来のメンテナンスを考えた素材選び',text:'外壁・屋根や防蟻など、将来の点検・メンテナンスを見据えて耐久性のある材料選びを提案する考え方。',source:'社内資料',verified:false},
+{id:'price1',cat:'品質・価格',title:'坪単価の過去資料',text:'過去の社内資料には坪単価70〜80万円（税込）程度の記載があるが、価格は時期・面積・仕様で変わるため現行価格として使用しない。',source:'社内資料',verified:false,verify:true},
+{id:'promo1',cat:'制度・キャンペーン',title:'オーナー紹介制度',text:'過去資料に紹介特典の記載があるが、キャンペーン内容は変動するため投稿に使う前に最新条件を必ず確認する。',source:'社内資料',verified:false,verify:true},
+{id:'sub1',cat:'制度・キャンペーン',title:'住宅関連補助金',text:'補助金は年度や条件で変更されるため、台本では制度名や金額を固定情報として扱わず、必ず最新の公的情報・社内確認を行う。',source:'社内資料',verified:false,verify:true},
+{id:'qa_brand1',cat:'会社・ブランド',title:'「人生をカッコよくする会社」の意味',text:'単に家という箱を売る会社ではなく、住む人に合わせて唯一無二の家づくりを行う考え方。「標準」に自分を合わせるのではなく、趣味や家族との時間を最大限楽しめる場所をつくり、日々の暮らしから人生をデザインすることを目指す。',source:'添付Q&A資料',verified:false},
+{id:'qa_area1',cat:'相談・サポート',title:'施工エリア（社内Q&A記載）',text:'茨城県神栖市を中心に、鹿嶋市、潮来市、行方市、鉾田市、稲敷市、および千葉県北東部（香取市、銚子市、旭市など）を主な施工エリアとして記載。その他地域も対応可能な場合があるため相談可。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_consult1',cat:'相談・サポート',title:'家づくり相談は無料',text:'間取りプラン、土地探し、住宅ローン、資金計画まで専門アドバイザーがワンストップで相談に対応すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_single1',cat:'相談・サポート',title:'一人暮らしでも注文住宅は可能',text:'自分らしく自由な暮らしを楽しむため、一人ひとりのライフスタイルに合わせた家づくりをサポートする。',source:'添付Q&A資料',verified:false},
+{id:'qa_land1',cat:'土地',title:'土地探しもサポート',text:'建築会社の視点で、希望の建物が建てられる土地か、地盤の状態や日当たりなどを含めてアドバイスする。',source:'添付Q&A資料',verified:false},
+{id:'qa_land2',cat:'土地',title:'土地が決まっていなくても相談可能',text:'土地が決まる前から相談可能。希望エリアや予算に合わせて条件に合致した売地情報をまとめ、位置図や資料を提供する。',source:'添付Q&A資料',verified:false},
+{id:'qa_land3',cat:'土地',title:'所有地がある場合の提案',text:'敷地の形状や法規制、周辺環境を確認したうえで、その土地の良さを最大限に活かしたプランを提案する。',source:'添付Q&A資料',verified:false},
+{id:'qa_land4',cat:'土地',title:'現地調査で確認する項目',text:'土地の正確な形状や高低差、道路状況、水道・ガスなどのインフラ、日当たり、周辺環境、法規制などを細かく確認し、見積りやプラン作成の精度を高める。',source:'添付Q&A資料',verified:false},
+{id:'qa_rebuild1',cat:'相談・サポート',title:'建て替え相談',text:'現在の敷地調査から、解体費用を含めた総予算の算出、新しい間取りプラン作成まで無料で相談できると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_order1',cat:'設計・デザイン',title:'自由設計・注文住宅',text:'基本は一棟一棟、お客様の要望に合わせてつくる自由設計の注文住宅。規格住宅のような一律の間取りではなく、ライフスタイルに合わせて提案する。',source:'添付Q&A資料',verified:false},
+{id:'qa_reform1',cat:'リフォーム・インテリア',title:'リフォーム対応',text:'間取り変更や水回り設備の交換、外壁・屋根塗装など、ライフスタイルの変化に合わせた増改築や設備更新をサポートすると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_quality1',cat:'品質・価格',title:'品質とコストのバランス',text:'単なる「高スペックな家」を目指すのではなく、地域の気候では過剰なスペックがコストアップにつながる場合も踏まえ、人生を豊かにする住まいとのバランスを重視する考え方。',source:'添付Q&A資料',verified:false},
+{id:'qa_design1',cat:'設計・デザイン',title:'唯一無二のデザイン',text:'お客様の個性に寄り添った唯一無二のデザインを強みとし、コンセプト設計やコーディネートを含めて提案する。',source:'添付Q&A資料',verified:false},
+{id:'qa_interior1',cat:'リフォーム・インテリア',title:'インテリアのみの相談も可能',text:'家具のコーディネート、照明計画、色使いなど、今の住まいの雰囲気をより良くするためのサポートに対応。',source:'添付Q&A資料',verified:false},
+{id:'qa_interior2',cat:'リフォーム・インテリア',title:'他社で建てた家のインテリア相談',text:'実際の住まいへ訪問して現地調査を行い、部屋の寸法、既存家具の色味、生活動線などを確認したうえで、家具のサイズ感やレイアウトを提案すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_visual1',cat:'設計・デザイン',title:'完成イメージを見える化',text:'図面だけでは分かりにくい実際の広さや雰囲気を、パースや一棟ごとのデザイン提案などで確認しやすくする。',source:'添付Q&A資料',verified:false},
+{id:'qa_price1',cat:'品質・価格',title:'建築費用の目安（社内Q&A）',text:'延床面積や仕様で異なるが、社内Q&Aには平均的な坪単価70〜80万円程度（税込）の記載がある。住まいの形状や採用設備で変動するため、現行価格としては必ず確認する。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_subsidy1',cat:'制度・キャンペーン',title:'補助金・助成金の活用',text:'国や自治体の住宅関連補助金等について、対象制度を確認し、申請手続きもサポートする旨の記載。制度は年度で変わるため必ず最新確認する。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_loan1',cat:'住宅ローン',title:'住宅ローン相談・資金計画',text:'提携銀行の紹介やライフプランに合わせた借入計画のシミュレーションをサポートする。',source:'添付Q&A資料',verified:false},
+{id:'qa_loan2',cat:'住宅ローン',title:'単身者の住宅ローン',text:'単身でも住宅ローン相談は可能。無理のない返済計画を立てるため、資金計画を丁寧に相談すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_loan3',cat:'住宅ローン',title:'自己資金ゼロの場合',text:'自己資金がゼロでも住宅ローンを組める場合はあるが、一般的には諸費用分の現金があると選択肢が広がる。貯蓄状況に合わせて資金計画を個別提案する。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_loan4',cat:'住宅ローン',title:'他の借入がある場合',text:'車のローンやカードのリボ払いなどがある場合も住宅ローンを検討できるケースはあるが、現在の債務状況に合わせて返済計画を立てる必要がある。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_contract1',cat:'品質・価格',title:'契約後の追加費用',text:'契約時のプラン内容に変更がなければ原則追加費用は発生しない旨の記載。ただし着工後の仕様変更やオプション追加、地盤調査結果によって別途費用が発生する場合がある。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_pet1',cat:'設計・デザイン',title:'ペットと暮らす家',text:'ペットと一緒に住みたい場合、ペットに合わせた素材選びや間取りの工夫を提案すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_compact1',cat:'設計・デザイン',title:'平屋・コンパクトな家',text:'平屋やコンパクトな住まいにも対応し、敷地条件や暮らし方に合わせて無駄の少ないプランを提案する。',source:'添付Q&A資料',verified:false},
+{id:'qa_garage1',cat:'設計・デザイン',title:'ガレージハウス',text:'車やバイクを楽しむ暮らしに合わせたガレージハウスにも対応すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_barrier1',cat:'設計・デザイン',title:'バリアフリー設計',text:'将来の暮らし方も見据え、段差や動線などに配慮したバリアフリー設計に対応すると記載。',source:'添付Q&A資料',verified:false},
+{id:'qa_structure1',cat:'性能',title:'耐震等級3（社内Q&A）',text:'社内Q&Aでは耐震性能の最高等級である耐震等級3を全棟で実現すると記載。揺れを軽減する制振ダンパーもオプション提案可能。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_insulation1',cat:'性能',title:'断熱性能 UA値0.46（社内Q&A）',text:'断熱材やサッシの選定により、UA値0.46を実現すると社内Q&Aに記載。モデルプランによる計測値との注記あり。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_termite1',cat:'保証・メンテ',title:'シロアリ対策',text:'シロアリに強い樹種、基礎パッキン工法による床下通気、人体に配慮した薬剤による防蟻処理を標準施工し、5年ごとの保証・点検制度を整えている旨の記載。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_maint1',cat:'保証・メンテ',title:'メンテナンスの目安',text:'10〜15年ごとの外壁・屋根の点検や塗装、防蟻処理の更新を推奨。耐久性の高い素材を使い、将来のメンテナンスコストを抑える工夫を行う。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_equipment1',cat:'保証・メンテ',title:'設備交換の目安',text:'給湯器などの設備更新は15年前後で発生することがあるため、初期段階で耐久性の高い素材を提案し、長期的なコスト管理をサポートする。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_warranty1',cat:'保証・メンテ',title:'保証・定期点検（社内Q&A）',text:'住宅瑕疵担保責任保険10年に加え独自の長期保証制度、お引渡し後2年間で3回の定期巡回、その後5年ごとの定期点検サービス等の記載がある。手書き修正もあるため、保証期間・無償範囲は公開前に最新確認必須。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_referral1',cat:'制度・キャンペーン',title:'オーナー紹介制度（社内Q&A）',text:'社内Q&Aには、紹介者へ10万円分の商品券、紹介先へ10万円分のWOODY HOUSE取扱商品を贈る旨の記載がある。適用条件・金額は変動可能性が高いため投稿前に必ず最新確認する。',source:'添付Q&A資料',verified:false,verify:true},
+{id:'qa_meeting1',cat:'相談・サポート',title:'打ち合わせ回数',text:'外観・間取り・内装・コーディネート・電気配線・コンセント配置など、納得できるまで丁寧に進める旨の記載。回数を固定せず内容に応じて進行する。',source:'添付Q&A資料',verified:false},
+{id:'qa_owneritem1',cat:'設計・デザイン',title:'オーナー支給',text:'一部設備についてオーナー支給に対応可能とする記載がある。対象・条件は商品や施工条件で異なるため事前確認が必要。',source:'添付Q&A資料',verified:false,verify:true},
+];
+const PAST=[{"sheet": "済_台本１", "title": "「人生をかっこよくする会社」", "ref": "https://www.instagram.com/reel/DRHlehJEyXV/?igsh=b2o2cHo0YnVrNWxo", "rows": [{"cut": 1, "telop": "家づくりで迷う人が", "voice": "家づくりで迷う人が", "visual": "ー"}, {"cut": 2, "telop": "最初に見落としがちなこと", "voice": "最初に見落としがちなこと", "visual": "ー"}, {"cut": 3, "telop": "価格・デザイン・性能", "voice": "価格・デザイン・性能", "visual": "ー"}, {"cut": 4, "telop": "会社ごとにバラバラで、", "voice": "会社ごとにバラバラで", "visual": "ー"}, {"cut": 5, "telop": "どこを見ればいいか分からなくなる", "voice": "どこを見ればいいか分からなくなる", "visual": "ー"}, {"cut": 6, "telop": "でも、比較するべきなのは", "voice": "でも、比較するべきなのは", "visual": "ー"}, {"cut": 7, "telop": "「家のスペック」", "voice": "家のスペック", "visual": "ー"}, {"cut": 8, "telop": "ではありません", "voice": "ではありません", "visual": "ー"}, {"cut": 9, "telop": "はっきり言って性能や強度は、", "voice": "はっきり言って性能や強度は、", "visual": "ー"}, {"cut": 10, "telop": "お金をかければいくらでも上がる", "voice": "お金をかければいくらでも上がる", "visual": "ー"}, {"cut": 11, "telop": "本当に大切なのは、", "voice": "本当に大切なのは", "visual": "ー"}, {"cut": 12, "telop": "「そこでどんな時間を過ごしたいか」", "voice": "そこでどんな時間を過ごしたいか", "visual": "ー"}, {"cut": 13, "telop": "毎日帰る場所だからこそ、", "voice": "毎日帰る場所だからこそ", "visual": "ー"}, {"cut": 14, "telop": "スペックや価格の数字ではなく、", "voice": "スペックや価格の数字ではなく", "visual": "ー"}, {"cut": 15, "telop": "納得できる「暮らしのイメージ」を", "voice": "納得できる暮らしのイメージを", "visual": "ー"}, {"cut": 16, "telop": "神栖市周辺で、", "voice": "神栖市周辺で", "visual": "ー"}, {"cut": 17, "telop": "家づくりを考え始めた方へ", "voice": "家づくりを考え始めた方へ", "visual": "ー"}, {"cut": 18, "telop": "まずは理想の暮らしを", "voice": "まずは理想の暮らしを", "visual": "ー"}, {"cut": 19, "telop": "言葉にすることから", "voice": "言葉にすることから", "visual": "ー"}, {"cut": 20, "telop": "", "voice": "", "visual": "ー"}, {"cut": 21, "telop": "", "voice": "", "visual": "ー"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本２", "title": "済_台本２", "ref": "https://www.instagram.com/reel/DWF8Y-FAFrD/?igsh=MWllYnNocHJtdG11dQ==", "rows": [{"cut": 1, "telop": "家づくり", "voice": "家づくり", "visual": "ー"}, {"cut": 2, "telop": "ちゃんと考えてますか？", "voice": "ちゃんと考えてますか", "visual": "ー"}, {"cut": 3, "telop": "価格もデザインも違う", "voice": "価格もデザインも違う", "visual": "ー"}, {"cut": 4, "telop": "結局、何を選べばいいの？", "voice": "結局何を選べばいいの", "visual": "ー"}, {"cut": 5, "telop": "答えは、家の形じゃなくて", "voice": "答えは、家の形じゃなくて", "visual": "ー"}, {"cut": 6, "telop": "”暮らし方”です", "voice": "暮らし方です", "visual": "ー"}, {"cut": 7, "telop": "家族の時間や", "voice": "私たちは家族の時間や", "visual": "ー"}, {"cut": 8, "telop": "好きなものに囲まれる暮らし", "voice": "好きなものに囲まれる暮らし", "visual": "ー"}, {"cut": 9, "telop": "あなたらしい人生を作る", "voice": "あなたらしい人生を作る場所を", "visual": "ー"}, {"cut": 10, "telop": "毎日帰る家だからこそ", "voice": "毎日帰る家だからこそ", "visual": "ー"}, {"cut": 11, "telop": "妥協じゃなくてこだわりたい", "voice": "妥協じゃなくてこだわりたい", "visual": "ー"}, {"cut": 12, "telop": "神栖市周辺で家づくりを", "voice": "神栖市周辺で家づくりを", "visual": "ー"}, {"cut": 13, "telop": "考え始めた方へ", "voice": "考え始めた方へ", "visual": "ー"}, {"cut": 14, "telop": "ご来場、お待ちしています🏠", "voice": "ご来場、お待ちしています", "visual": "ー"}, {"cut": 15, "telop": "", "voice": "", "visual": "ー"}, {"cut": 16, "telop": "", "voice": "", "visual": "ー"}, {"cut": 17, "telop": "", "voice": "", "visual": "ー"}, {"cut": 18, "telop": "", "voice": "", "visual": "ー"}, {"cut": 19, "telop": "", "voice": "", "visual": "ー"}, {"cut": 20, "telop": "", "voice": "", "visual": "ー"}, {"cut": 21, "telop": "", "voice": "", "visual": "ー"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本３", "title": "済_台本３", "ref": "", "rows": [{"cut": 1, "telop": "家づくりで後悔する人って", "voice": "家づくりで後悔する人って", "visual": "足元のアングル"}, {"cut": 2, "telop": "実は、”ある場所に”", "voice": "実はある場所に", "visual": "後ろ姿で歩く"}, {"cut": 3, "telop": "行ってない人が多いです！", "voice": "行ってない人が多いです", "visual": "後ろ姿で歩く"}, {"cut": 4, "telop": "その場所とは、", "voice": "その場所とは", "visual": "看板の下側"}, {"cut": 5, "telop": "完成見学会です。", "voice": "完成見学会です", "visual": "看板と垂れ幕"}, {"cut": 6, "telop": "図面や写真では分からない", "voice": "図面や写真では分からない", "visual": "胸元で大きくＸを作る"}, {"cut": 7, "telop": "『この家、なんか落ち着く。』", "voice": "この家なんか落ち着く", "visual": "モデルハウスの玄関を開ける"}, {"cut": 8, "telop": "住み心地を実際に体感できます🏠", "voice": "住み心地を実際に体感できます", "visual": "ソファーで寛ぐ"}, {"cut": 9, "telop": "家ごとに", "voice": "家ごとに", "visual": "カタログを広げる"}, {"cut": 10, "telop": "デザインや間取りも比較できて", "voice": "デザインや間取りも比較できて", "visual": "カタログのページをめくる"}, {"cut": 11, "telop": "『こんな暮らしがしたい！』", "voice": "こんな暮らしがしたい", "visual": "カタログを見る"}, {"cut": 12, "telop": "イメージがしやすくなります", "voice": "イメージがしやすくなります", "visual": "カタログを見る"}, {"cut": 13, "telop": "土地探しや住宅ローンの相談も", "voice": "土地探しや住宅ローンの相談も", "visual": "カタログをまとめる"}, {"cut": 14, "telop": "無料でできるので", "voice": "無料でできるので", "visual": "カタログをまとめる"}, {"cut": 15, "telop": "家づくりを", "voice": "家づくりを", "visual": "カタログの上にグッドする"}, {"cut": 16, "telop": "考え始めたばかりの方にもピッタリ", "voice": "考え始めたばかりの方にもピッタリ", "visual": "カタログの上にグッドする"}, {"cut": 17, "telop": "気になる方は", "voice": "気になる方は", "visual": "事務所に歩いていく"}, {"cut": 18, "telop": "プロフィールのリンクから", "voice": "プロフィールのリンクから", "visual": "プロフィールのスクショ"}, {"cut": 19, "telop": "イベント・見学会ページを", "voice": "イベント・見学会ページを", "visual": "ホームページのスクショ"}, {"cut": 20, "telop": "チェックして、気になる日程に", "voice": "チェックして、気になる日程に", "visual": "受付に向かう"}, {"cut": 21, "telop": "ぜひ参加してみてください！", "voice": "ぜひ参加してみてください", "visual": "受付に向かう"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本４", "title": "注文住宅　結局　いくら？", "ref": "", "rows": [{"cut": 1, "telop": "新築って結局いくらかかるの？", "voice": "新築って結局いくらかかるの", "visual": "カタログを見る"}, {"cut": 2, "telop": "実は〇〇を知らないと", "voice": "実は〇〇を知らないと", "visual": "カタログを持って歩く"}, {"cut": 3, "telop": "大きく変わります！", "voice": "大きく変わります", "visual": "カタログを持って歩く"}, {"cut": 4, "telop": "注文住宅は", "voice": "注文住宅は", "visual": "モデルハウスを開ける"}, {"cut": 5, "telop": "家の大きさや設備によって", "voice": "家の大きさや設備によって", "visual": "モデルハウスを開ける"}, {"cut": 6, "telop": "金額が変わりますが", "voice": "金額が変わりますが", "visual": "説明してる感じ"}, {"cut": 7, "telop": "建物の目安は", "voice": "建物の目安は", "visual": "説明してる感じ"}, {"cut": 8, "telop": "坪単価70~80万円（税込み）です", "voice": "坪単価70~80万円です", "visual": "説明してる感じ（お金のフリー素材）"}, {"cut": 9, "telop": "ただし、土地の条件や間取り", "voice": "ただし、土地の条件や間取り", "visual": "カタログを見せて説明"}, {"cut": 10, "telop": "設備によって金額は変わるので", "voice": "設備によって金額は変わるので", "visual": "カタログを見せて説明"}, {"cut": 11, "telop": "ネットの情報だけで", "voice": "ネットの情報だけで", "visual": "カタログを見せて説明"}, {"cut": 12, "telop": "判断するのは危険です！", "voice": "判断するのは危険です", "visual": "正面でバツ印を作る"}, {"cut": 13, "telop": "うちは実際いくらになるの？💰", "voice": "うちは実際いくらになるの", "visual": "考えるような仕草"}, {"cut": 14, "telop": "という方は", "voice": "という方は", "visual": "考えるような仕草"}, {"cut": 15, "telop": "まずはプランの相談がおすすめです！", "voice": "まずはプランの相談がおすすめです", "visual": "アイデアが浮かんだような仕草"}, {"cut": 16, "telop": "土地やご希望をもとに", "voice": "土地やご希望をもとに", "visual": "パソコンで調べものしてる感じ"}, {"cut": 17, "telop": "あなたに合った", "voice": "あなたに合った", "visual": "パソコンで調べものしてる感じ"}, {"cut": 18, "telop": "リアルな見積もりをご案内します", "voice": "リアルな見積もりをご案内します", "visual": "パソコンで調べものしてる感じ"}, {"cut": 19, "telop": "気になる方はプロフィールから", "voice": "気になる方はプロフィールから", "visual": "Instagramのプロフィール"}, {"cut": 20, "telop": "来場予約してみてください🏠", "voice": "来場予約してみてください", "visual": "Instagramのプロフィール"}, {"cut": 22, "telop": "「〇人家族」って、コメントすると", "voice": "", "visual": ""}, {"cut": 23, "telop": "プレゼントをお渡しします🎁", "voice": "", "visual": ""}]}, {"sheet": "済_台本5", "title": "土地探し　迷ったら　これやって！", "ref": "", "rows": [{"cut": 1, "telop": "土地探しって", "voice": "土地探しって", "visual": "地図を見る"}, {"cut": 2, "telop": "不動産屋さんに任せれば大丈夫…", "voice": "不動産屋さんに任せれば大丈夫", "visual": "地図を見る"}, {"cut": 3, "telop": "そう思ってませんか？", "voice": "そう思ってませんか", "visual": "フリーズさせて、モノクロ、少しズーム"}, {"cut": 4, "telop": "じつはその土地、建てたい家が", "voice": "じつはその土地、希望の間取りで", "visual": "パソコンで頭を抱えてる"}, {"cut": 5, "telop": "建てられない可能性もあるんです！", "voice": "建てられない可能性もあるんです", "visual": "パソコンで頭を抱えてる"}, {"cut": 6, "telop": "だから私たちは", "voice": "だから私たちは", "visual": "正面で胸に手を当てて、安心できるアピール"}, {"cut": 7, "telop": "土地探しからお手伝いします", "voice": "土地探しからお手伝いします", "visual": "正面で胸に手を当てて、安心できるアピール"}, {"cut": 8, "telop": "建築のプロが", "voice": "建築のプロが", "visual": "パソコンの画面を見せて説明（横瀬分譲地の測量図）"}, {"cut": 9, "telop": "希望の間取りが入るか", "voice": "地盤の状態や日当たり、", "visual": "パソコンの画面を見せて説明（横瀬分譲地の測量図）"}, {"cut": 10, "telop": "地盤の状態や日当たりまで", "voice": "法的に建てられるかまで", "visual": "パソコンの画面を見せて説明（横瀬分譲地の測量図）"}, {"cut": 11, "telop": "チェックします！", "voice": "チェックします", "visual": "パソコンの画面を見せて説明（横瀬分譲地の測量図）"}, {"cut": 12, "telop": "”安い土地”ではなく", "voice": "安いだけの土地ではなく", "visual": "ノートでメモとる"}, {"cut": 13, "telop": "”後悔しない土地”を", "voice": "後悔しない土地を", "visual": "ノートでメモとる"}, {"cut": 14, "telop": "一緒に見つけます🔍", "voice": "一緒に見つけます", "visual": "ノートでメモとる（ZOOM）"}, {"cut": 15, "telop": "土地選びで失敗したくない方は", "voice": "土地選びで失敗したくない方は", "visual": "事務所に向かって歩く"}, {"cut": 16, "telop": "お気軽にご相談ください", "voice": "お気軽にご相談ください", "visual": "事務所に向かって歩く"}, {"cut": 17, "telop": "気になる方はプロフィールから", "voice": "気になる方はプロフィールから", "visual": "Instagramのプロフィール"}, {"cut": 18, "telop": "来場予約してみてください🏠", "voice": "来場予約してみてください", "visual": "Instagramのプロフィール"}, {"cut": 19, "telop": "", "voice": "", "visual": "ー"}, {"cut": 20, "telop": "", "voice": "", "visual": "ー"}, {"cut": 21, "telop": "", "voice": "", "visual": "ー"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本6", "title": "WOODYHOUSE　どこ？　エリアは？", "ref": "", "rows": [{"cut": 1, "telop": "WOODY HOUSEって", "voice": "WOODY HOUSEって", "visual": "外観"}, {"cut": 2, "telop": "ぶっちゃけ、どこにあって", "voice": "ぶっちゃけ、どこにあって", "visual": "地図を見る"}, {"cut": 3, "telop": "施工エリアってあるの？", "voice": "対応エリアってあるの？", "visual": "地図を見る"}, {"cut": 4, "telop": "弊社は茨城県神栖市にあります🏠", "voice": "弊社は茨城県神栖市にあります🏠", "visual": "ストリートビューを見せる"}, {"cut": 5, "telop": "対応しているエリアは", "voice": "対応しているエリアは", "visual": "ー"}, {"cut": 6, "telop": "茨城県の", "voice": "茨城県の", "visual": "茨城県の地図"}, {"cut": 7, "telop": "神栖市、鹿嶋市、潮来市", "voice": "神栖市、鹿嶋市、潮来市", "visual": "各エリア"}, {"cut": 8, "telop": "行方市、鉾田市、稲敷市", "voice": "行方市、鉾田市、稲敷市", "visual": "各エリア"}, {"cut": 9, "telop": "千葉県の", "voice": "千葉県の", "visual": "千葉県の地図"}, {"cut": 10, "telop": "香取市、銚子市、旭市", "voice": "香取市、銚子市、旭市", "visual": "各エリア"}, {"cut": 11, "telop": "などが主な施工エリアです", "voice": "などが主な施工エリアです", "visual": "鹿行地域中心の地図"}, {"cut": 12, "telop": "疑問や不安に感じたら", "voice": "疑問や不安に感じたら", "visual": "考える感じ"}, {"cut": 13, "telop": "弊社は無料で相談できますので", "voice": "弊社は無料で相談できますので", "visual": "考える感じ"}, {"cut": 14, "telop": "一度、来場してみてください！", "voice": "一度、来場してみてください！", "visual": "いつもの"}, {"cut": 15, "telop": "予約はプロフィールからできます🏠", "voice": "予約はプロフィールからできます🏠", "visual": "いつもの"}, {"cut": 16, "telop": "", "voice": "", "visual": "ー"}, {"cut": 17, "telop": "", "voice": "", "visual": "ー"}, {"cut": 18, "telop": "", "voice": "", "visual": "ー"}, {"cut": 19, "telop": "", "voice": "", "visual": "ー"}, {"cut": 20, "telop": "", "voice": "", "visual": "ー"}, {"cut": 21, "telop": "", "voice": "", "visual": "ー"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本7", "title": "契約後　追加費用　発生する？", "ref": "", "rows": [{"cut": 1, "telop": "お家づくりで", "voice": "お家づくりで", "visual": "ー"}, {"cut": 2, "telop": "追加費用が発生したら", "voice": "追加費用が発生したら", "visual": "ー"}, {"cut": 3, "telop": "ショックですよね…", "voice": "ショックですよね…", "visual": "ー"}, {"cut": 4, "telop": "お家づくりで", "voice": "お家づくりで", "visual": "ー"}, {"cut": 5, "telop": "１番シビアなのは", "voice": "１番シビアなのは", "visual": "ー"}, {"cut": 6, "telop": "お金周りです💰", "voice": "お金周りです", "visual": "ー"}, {"cut": 7, "telop": "ご契約時のプラン変更がない場合", "voice": "ご契約時のプラン変更がない場合", "visual": "ー"}, {"cut": 8, "telop": "追加費用は発生しませんが", "voice": "追加費用は発生しませんが", "visual": "ー"}, {"cut": 9, "telop": "着工後の仕様変更や", "voice": "着工後の仕様変更や", "visual": "ー"}, {"cut": 10, "telop": "オプションの追加", "voice": "オプションの追加", "visual": "ー"}, {"cut": 11, "telop": "または地盤調査の結果で", "voice": "または地盤調査の結果で", "visual": "ー"}, {"cut": 12, "telop": "より補強工事が", "voice": "より補強工事が", "visual": "ー"}, {"cut": 13, "telop": "必要になった場合などは", "voice": "必要になった場合などは", "visual": "ー"}, {"cut": 14, "telop": "別途費用を", "voice": "別途費用を", "visual": "ー"}, {"cut": 15, "telop": "ご相談させていただくことがあります！", "voice": "ご相談させていただくことがあります", "visual": "ー"}, {"cut": 16, "telop": "透明性の高い", "voice": "透明性の高い", "visual": "ー"}, {"cut": 17, "telop": "家づくりを心がけ", "voice": "家づくりを心がけ", "visual": "ー"}, {"cut": 18, "telop": "費用が発生する場合は", "voice": "費用が発生する場合は", "visual": "ー"}, {"cut": 19, "telop": "その都度丁寧にご説明いたします！", "voice": "その都度丁寧にご説明いたします", "visual": "ー"}, {"cut": 20, "telop": "弊社は無料で相談できますので", "voice": "弊社は無料で相談できますので", "visual": "考える感じ"}, {"cut": 21, "telop": "一度、来場してみてください！", "voice": "一度、来場してみてください", "visual": "いつもの"}, {"cut": 22, "telop": "予約はプロフィールからできます🏠", "voice": "予約はプロフィールからできます", "visual": "いつもの"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本8", "title": "Woody House　紹介", "ref": "", "rows": [{"cut": 1, "telop": "WOODY　HOUSE", "voice": "WOODY　HOUSE", "visual": "受付"}, {"cut": 2, "telop": "名前も知らない", "voice": "名前も知らない", "visual": "ジェスチャー"}, {"cut": 3, "telop": "場所も知らない", "voice": "場所も知らない", "visual": "ジェスチャー"}, {"cut": 4, "telop": "そんな方に向けて紹介します！", "voice": "そんな方に向けて紹介します！", "visual": "ようこそジェスチャー"}, {"cut": 5, "telop": "WOODYHOUSEは", "voice": "WOODYHOUSEは", "visual": "看板のアップ"}, {"cut": 6, "telop": "茨城県神栖市に構える", "voice": "茨城県神栖市に構える", "visual": "神栖市の地図"}, {"cut": 7, "telop": "注文住宅会社です🏠", "voice": "注文住宅会社です", "visual": "事務所の外観"}, {"cut": 8, "telop": "他の人と同じような", "voice": "他の人と同じような", "visual": "ブースに向けて歩く"}, {"cut": 9, "telop": "お家じゃない方がいい", "voice": "お家じゃない方がいい", "visual": "ブースに向けて歩く"}, {"cut": 10, "telop": "カッコイイ家に住みたい", "voice": "カッコイイ家に住みたい", "visual": "カタログ"}, {"cut": 11, "telop": "おしゃれな家に住みたい", "voice": "おしゃれな家に住みたい", "visual": "カタログ"}, {"cut": 12, "telop": "その希望を叶えられます✨", "voice": "その希望を叶えられます", "visual": "喜びポーズ"}, {"cut": 13, "telop": "本当にそんな会社あるの？", "voice": "本当にそんな会社あるの", "visual": "疑問に思うポーズ"}, {"cut": 14, "telop": "なんて、疑問に思ったら", "voice": "なんて、疑問に思ったら", "visual": "疑問に思うポーズ"}, {"cut": 15, "telop": "弊社は無料で", "voice": "弊社は無料で", "visual": "説明してる"}, {"cut": 16, "telop": "相談できるので", "voice": "相談できるので", "visual": "説明してる"}, {"cut": 17, "telop": "是非、一度来場してみてください", "voice": "是非、一度来場してみてください", "visual": "説明してる"}, {"cut": 18, "telop": "プロフィールから", "voice": "プロフィールから", "visual": "プロフィール"}, {"cut": 19, "telop": "来場予約ができます", "voice": "来場予約ができます", "visual": "プロフィール"}, {"cut": 20, "telop": "", "voice": "", "visual": "ー"}, {"cut": 21, "telop": "", "voice": "", "visual": "ー"}, {"cut": 22, "telop": "", "voice": "", "visual": "ー"}, {"cut": 23, "telop": "", "voice": "", "visual": "ー"}]}, {"sheet": "済_台本9", "title": "WOODY HOUSE　モデルハウス　見学　Ⅰ", "ref": "", "rows": [{"cut": 1, "telop": "マイホームが想像できない方へ。", "voice": "マイホームが想像できない方へ", "visual": "カタログを見る"}, {"cut": 2, "telop": "その悩み、30分で解決できる", "voice": "その悩み、30分で解決できる", "visual": "カタログを見る"}, {"cut": 3, "telop": "場所があることを知ってますか？", "voice": "場所があることを知ってますか", "visual": "疑問に思う"}, {"cut": 4, "telop": "それが、モデルハウスです🏠", "voice": "それが、モデルハウスです", "visual": "モデルハウス外観"}, {"cut": 5, "telop": "家を建てたいけど", "voice": "家を建てたいけど", "visual": "モデルハウスの玄関に向かう"}, {"cut": 6, "telop": "どんな間取りがいいの？", "voice": "どんな間取りがいいの", "visual": "玄関を開ける"}, {"cut": 7, "telop": "リビングはどれくらいの広さ？", "voice": "リビングはどれくらいの広さ", "visual": "リビングのソファでつくろぐ"}, {"cut": 8, "telop": "収納ってどれくらい必要？", "voice": "収納ってどれくらい必要", "visual": "クローゼットに服をかける"}, {"cut": 9, "telop": "家づくりを始める方の多くが", "voice": "家づくりを始める方の多くが", "visual": "宮内さんと山本さんが話してる"}, {"cut": 10, "telop": "最初はイメージできていません", "voice": "最初はイメージできていません", "visual": "宮内さんと山本さんが話してる"}, {"cut": 11, "telop": "モデルハウスなら", "voice": "モデルハウスなら", "visual": "1階を見渡す（出演なし）"}, {"cut": 12, "telop": "写真では分からない", "voice": "写真では分からない", "visual": "モデルハウスのカタログを見る"}, {"cut": 13, "telop": "暮らしを体感できます！", "voice": "暮らしを体感できます", "visual": "カタログと部屋を比べる"}, {"cut": 14, "telop": "実際に見て歩くだけで", "voice": "実際に見て歩くだけで", "visual": "玄関からリビングを歩く"}, {"cut": 15, "telop": "こんな家に住みたい！", "voice": "こんな家に住みたい", "visual": "山）腕組んでうなずく"}, {"cut": 16, "telop": "がどんどん見えてきます", "voice": "がどんどん見えてきます", "visual": "宮）和室でくつろぐ"}, {"cut": 17, "telop": "まずは気軽に", "voice": "まずは気軽に", "visual": "リビングを見て相談する"}, {"cut": 18, "telop": "モデルハウスを見学して", "voice": "モデルハウスを見学して", "visual": "リビングを見て相談する"}, {"cut": 19, "telop": "理想の暮らしを", "voice": "理想の暮らしを", "visual": "二人そろって出勤"}, {"cut": 20, "telop": "イメージしてみませんか？", "voice": "イメージしてみませんか", "visual": "二人そろって出勤"}, {"cut": 21, "telop": "見学予約は", "voice": "見学予約は", "visual": "外観でいつもの"}, {"cut": 22, "telop": "プロフィールのリンクから", "voice": "プロフィールのリンクから", "visual": "外観でいつもの"}, {"cut": 23, "telop": "お気軽にどうぞ🏠", "voice": "お気軽にどうぞ", "visual": "外観でいつもの"}]}, {"sheet": "済_台本10", "title": "土日こそモデルハウス見学に行くべき理由", "ref": "", "rows": [{"cut": 1, "telop": "家を建ててから", "voice": "家を建ててから", "visual": "モデルハウスの外観"}, {"cut": 2, "telop": "”後悔する人”の共通点", "voice": "後悔する人の共通点", "visual": "頭を抱える"}, {"cut": 3, "telop": "知ってますか？", "voice": "知ってますか", "visual": "すしざんまいみたいなアクション"}, {"cut": 4, "telop": "実はその方たち...", "voice": "実はその方たち", "visual": "モデルハウスに向かって歩く"}, {"cut": 5, "telop": "モデルハウスをほぼ見てません", "voice": "モデルハウスをほぼ見てません", "visual": "モデルハウスに向かって歩く（モノクロ化）"}, {"cut": 6, "telop": "ネットや間取りだけでは", "voice": "ネットや間取りだけでは", "visual": "スマホで探してる感じ"}, {"cut": 7, "telop": "本当の暮らしやすい家は", "voice": "本当の暮らしやすい家は", "visual": "スマホで探してる感じ"}, {"cut": 8, "telop": "想像できません", "voice": "想像できません", "visual": "バツ印を作る"}, {"cut": 9, "telop": "土日祝に見学するメリットは", "voice": "土日祝に見学するメリットは", "visual": "モデルハウスの玄関を開ける"}, {"cut": 10, "telop": "家族で楽しく見学できる", "voice": "家族で楽しく見学できる", "visual": "談笑しながら見学"}, {"cut": 11, "telop": "家族みんなで体感できる", "voice": "家族みんなで体感できる", "visual": "談笑しながら見学"}, {"cut": 12, "telop": "家族全員で", "voice": "家族全員で", "visual": "山）嬉しそうにうなずく"}, {"cut": 13, "telop": "理想の暮らしをイメージできます！", "voice": "理想の暮らしをイメージできます", "visual": "2階の手すりに触れながら寝室に向かう"}, {"cut": 14, "telop": "理想の家づくりは", "voice": "理想の家づくりは", "visual": "リビングで話し合う"}, {"cut": 15, "telop": "まず見に行くことから🏠", "voice": "まず見に行くことから", "visual": "リビングで話し合う"}, {"cut": 16, "telop": "見学は無料です！", "voice": "見学は無料です", "visual": "スマホでこれいいってポーズ"}, {"cut": 17, "telop": "土日祝を空けて", "voice": "土日祝を空けて", "visual": "手帳を見る"}, {"cut": 18, "telop": "ゆっくり、モデルハウス", "voice": "ゆっくり、モデルハウス", "visual": "リビングやキッチンを見学する様子"}, {"cut": 19, "telop": "見学してみませんか？", "voice": "見学してみませんか", "visual": "リビングやキッチンを見学する様子"}, {"cut": 20, "telop": "あなたの『こんな家に住みたい！』", "voice": "あなたのこんな家に住みたい", "visual": "二人で出勤"}, {"cut": 21, "telop": "がきっと見つかります", "voice": "がきっと見つかります", "visual": "二人で出勤"}, {"cut": 22, "telop": "プロフィールのリンクから", "voice": "プロフィールのリンクから", "visual": "外観でいつもの"}, {"cut": 23, "telop": "見学会予約受付中🏠", "voice": "見学会予約受付中", "visual": "外観でいつもの"}]}, {"sheet": "台本11", "title": "台本11", "ref": "", "rows": [{"cut": 1, "telop": "僕にも家族ができて", "voice": "僕にも家族ができて", "visual": "フリー素材"}, {"cut": 2, "telop": "子供も大きくなったから", "voice": "子供も大きくなったから", "visual": "フリー素材"}, {"cut": 3, "telop": "いつまでも", "voice": "いつまでも", "visual": "ネット検索"}, {"cut": 4, "telop": "賃貸で生活するのもな...", "voice": "賃貸で生活するのもな...", "visual": "ネット検索"}, {"cut": 5, "telop": "自己資金でローン組むには", "voice": "自己資金でローン組むには", "visual": "銀行リサーチ"}, {"cut": 6, "telop": "いくら必要なんだろう？", "voice": "いくら必要なんだろう？", "visual": "銀行リサーチ"}, {"cut": 7, "telop": "その悩み、お答えします！", "voice": "その悩み、お答えします", "visual": "お答えしますポーズ"}, {"cut": 8, "telop": "自己資金がゼロでも", "voice": "自己資金がゼロでも", "visual": "袋を持っておいてないポーズ"}, {"cut": 9, "telop": "住宅ローンを", "voice": "住宅ローンを", "visual": "説明"}, {"cut": 10, "telop": "組むことができます。", "voice": "組むことができます。", "visual": "説明"}, {"cut": 11, "telop": "一般的には諸費用分", "voice": "一般的には諸費用分", "visual": "電卓＋パソコン"}, {"cut": 12, "telop": "総額の1割程度あれば", "voice": "総額の1割程度あれば", "visual": "電卓＋パソコン"}, {"cut": 13, "telop": "選択肢が広がります！", "voice": "選択肢が広がります", "visual": "電卓＋パソコン"}, {"cut": 14, "telop": "お客様の貯蓄状況に", "voice": "お客様の貯蓄状況に", "visual": "説明"}, {"cut": 15, "telop": "合わせた資金計画を", "voice": "合わせた資金計画を", "visual": "説明"}, {"cut": 16, "telop": "個別にご提案します！", "voice": "個別にご提案します", "visual": "安心してください"}, {"cut": 17, "telop": "WOODY HOUSEでは", "voice": "WOODY HOUSEでは", "visual": "後ろ姿"}, {"cut": 18, "telop": "家づくり相談を", "voice": "家づくり相談を", "visual": "後ろ姿"}, {"cut": 19, "telop": "無料ですることができます", "voice": "無料ですることができます", "visual": "受付"}, {"cut": 20, "telop": "プロフィールのリンクから", "voice": "プロフィールのリンクから", "visual": "いつもの"}, {"cut": 21, "telop": "来場予約ができます！", "voice": "来場予約ができるので", "visual": "いつもの"}, {"cut": 22, "telop": "お待ちしております🏠", "voice": "お待ちしております", "visual": "いつもの"}]}, {"sheet": "台本12", "title": "台本12", "ref": "", "rows": [{"cut": 1, "telop": "いろんな", "voice": "いろんな", "visual": "外に出る"}, {"cut": 2, "telop": "住宅会社見学行ったけど", "voice": "住宅会社見学行ったけど", "visual": "外に出る"}, {"cut": 3, "telop": "自分の理想とする家が", "voice": "自分の理想とする家が", "visual": "固まって首をかしげる"}, {"cut": 4, "telop": "見つからないな...", "voice": "見つからないな", "visual": "しゃがむ"}, {"cut": 5, "telop": "そういえば", "voice": "そういえば", "visual": "ポンってポーズ"}, {"cut": 6, "telop": "小見川に変わってる", "voice": "小見川に変わってる", "visual": "車載映像"}, {"cut": 7, "telop": "住宅会社の看板あったな！", "voice": "住宅会社の看板あったな", "visual": "車載映像"}, {"cut": 8, "telop": "あの会社", "voice": "あの会社", "visual": "車載映像（固定）"}, {"cut": 9, "telop": "WOODY HOUSE", "voice": "WOODY HOUSE", "visual": "車載映像（固定）"}, {"cut": 10, "telop": "へぇ～", "voice": "へぇ～", "visual": "車載映像（固定）"}, {"cut": 11, "telop": "ホームページだけじゃなくて", "voice": "ホームページだけじゃなくて", "visual": "ホームページ"}, {"cut": 12, "telop": "Instagramもある", "voice": "Instagramもある", "visual": "Instagram"}, {"cut": 13, "telop": "相談するのは無料", "voice": "相談するのは無料", "visual": "スマホをポケットに入れる"}, {"cut": 14, "telop": "悩んでるくらいなら", "voice": "悩んでるくらいなら", "visual": "立ち上がる"}, {"cut": 15, "telop": "行ってみよう！", "voice": "行ってみよう", "visual": "移動"}, {"cut": 16, "telop": "WOODY HOUSEでは", "voice": "WOODY HOUSEでは", "visual": "後ろ姿"}, {"cut": 17, "telop": "家づくり相談が", "voice": "家づくり相談が", "visual": "後ろ姿"}, {"cut": 18, "telop": "無料で受けられます", "voice": "無料で受けられます", "visual": "受付"}, {"cut": 19, "telop": "詳細はプロフィールの", "voice": "詳細はプロフィールの", "visual": "いつもの"}, {"cut": 20, "telop": "リンクから確認できます", "voice": "リンクから確認できます", "visual": "いつもの"}, {"cut": 21, "telop": "ご来場お待ちしております🏠", "voice": "ご来場お待ちしております", "visual": "いつもの"}]}];
+const CORRECTIONS=[{"issue": "声色が少し暗い", "improvement": "音読さんに代替"}, {"issue": "最初3秒で引きつけるワードが欲しいのと、一文が長いので台本を調整", "improvement": ""}, {"issue": "「結局何を選べばいいの？」のニュアンスのところでカタログや施工実例パンフレットなどを大量にドサッと机に置くカットを入れてみる", "improvement": ""}, {"issue": "「毎日帰る家だからこそ～」のあたりでモデルハウスで撮ったドアから出入りする動画やソファでリラックスしている動画を使う　など", "improvement": ""}, {"issue": "動画内にHPのオーナーズライフをスクロールさせる動画入れてみたり、施工実例画像を入れてみたり", "improvement": ""}, {"issue": "投稿時にはBGMを付ける", "improvement": "投稿するときに追加させる"}, {"issue": "0:22「妥協者なくて」誤字注意", "improvement": "誤字がないように細かいところまで確認してから提出する"}, {"issue": "次回視聴や来要予約に繋げるような文言を入れなかったのは商業臭が出過ぎるからでしょうか？", "improvement": "入れる版と入れない版でテスト中"}, {"issue": "最後に「次回は○○について解説」「見ているだけで○○の知識が付く」「家づくり相談はプロフィールリンクから」など", "improvement": "今後は入れていく"}, {"issue": "最後に企業コンセプト画像2秒、ロゴ画像2秒入れなくていい？", "improvement": "企業画像は入れても入れなくてもどちらでも問題なし"}, {"issue": "https://meet.google.com/tpw-psyr-xot", "improvement": ""}, {"issue": "https://meet.google.com/tpw-psyr-xot", "improvement": ""}];
+let selectedKB=new Set(), selectedPast=new Set(), lastDraft=null;
+
+const STOP=['家','住宅','注文住宅','woody','house','について','って','する','できる','です','ます','こと','ため','これ','その','あり','ない'];
+const SYN={
+ '土地':['土地','地盤','日当たり','現地調査','法規制','敷地'],
+ 'ローン':['ローン','資金','借入','自己資金','返済','銀行'],
+ 'お金':['価格','坪単価','費用','予算','資金','追加費用','見積'],
+ '価格':['価格','坪単価','費用','予算','見積'],
+ '性能':['耐震','断熱','UA','性能','構造','長期優良'],
+ '耐震':['耐震','制振','構造'],
+ '断熱':['断熱','UA','サッシ'],
+ 'メンテ':['保証','メンテ','点検','シロアリ','防蟻','給湯器'],
+ '保証':['保証','点検','瑕疵','アフター'],
+ 'デザイン':['デザイン','自由設計','インテリア','家具','照明','間取り'],
+ '間取り':['間取り','自由設計','プラン','動線','収納'],
+ 'モデルハウス':['モデルハウス','見学','体感','来場'],
+ '相談':['相談','無料','ワンストップ','サポート'],
+ '一人':['単身','一人暮らし','単身者'],
+ '建て替え':['建て替え','解体','敷地調査'],
+ 'リフォーム':['リフォーム','増改築','設備更新','インテリア']
+};
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function words(s){
+  let x=String(s||'').toLowerCase().replace(/[、。！？!?・（）()「」『』]/g,' ');
+  let arr=x.split(/\s+/).filter(Boolean);
+  Object.entries(SYN).forEach(([k,v])=>{if(x.includes(k))arr.push(...v.map(y=>y.toLowerCase()))});
+  return [...new Set(arr.filter(x=>x.length>1&&!STOP.includes(x)))];
+}
+function scoreText(query,text){
+  const ws=words(query); const t=String(text||'').toLowerCase(); let n=0;
+  ws.forEach(w=>{if(t.includes(w))n+=w.length>=4?4:2});
+  return n;
+}
+function kbScore(x,q){return scoreText(q,`${x.cat} ${x.title} ${x.text}`)+(x.source==='公式HP'?0.3:0)}
+function pastScore(x,q){return scoreText(q,`${x.title} ${x.rows.map(r=>r.telop+' '+r.voice).join(' ')}`)}
+function chosenKB(){return KB.filter(x=>selectedKB.has(x.id))}
+function chosenPast(){return PAST.filter((_,i)=>selectedPast.has(i))}
+function autoAngle(q){
+  q=q.toLowerCase();
+  if(/ローン|自己資金|坪単価|価格|費用|保証/.test(q))return'qa';
+  if(/土地|後悔|失敗|追加費用/.test(q))return'avoid';
+  if(/メンテ|点検|チェック/.test(q))return'check';
+  if(/会社|人生|コンセプト|デザイン/.test(q))return'contrast';
+  if(/見学|モデルハウス|発見/.test(q))return'story';
+  return'pro';
+}
+function autoPick(){
+  const q=(document.getElementById('theme').value+' '+document.getElementById('must').value).trim();
+  if(!q){alert('テーマを入力してください');return}
+  const ks=KB.map(x=>[x,kbScore(x,q)]).sort((a,b)=>b[1]-a[1]).filter(x=>x[1]>0).slice(0,6);
+  selectedKB=new Set(ks.map(x=>x[0].id));
+  const ps=PAST.map((x,i)=>[i,x,pastScore(x,q)]).sort((a,b)=>b[2]-a[2]).filter(x=>x[2]>0).slice(0,2);
+  if(!ps.length)ps.push([0,PAST[0],1]);
+  selectedPast=new Set(ps.map(x=>x[0]));
+  renderPicks();
+}
+function renderPicks(){
+  const q=(document.getElementById('theme').value+' '+document.getElementById('must').value).trim();
+  let klist=KB.map(x=>[x,kbScore(x,q)]).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  document.getElementById('knowledgePick').innerHTML=klist.map(([x,s])=>`<label class="source"><input type="checkbox" ${selectedKB.has(x.id)?'checked':''} onchange="toggleKB('${x.id}',this.checked)"><div><b>${esc(x.title)}</b><div><span class="badge">${esc(x.cat)}</span><span class="badge">${esc(x.source)}</span>${x.verify?'<span class="badge warn">要確認</span>':''}</div><p>${esc(x.text)}</p></div></label>`).join('')||'<p class="muted">該当候補なし</p>';
+  let plist=PAST.map((x,i)=>[i,x,pastScore(x,q)]).sort((a,b)=>b[2]-a[2]).slice(0,7);
+  document.getElementById('pastPick').innerHTML=plist.map(([i,x,s])=>`<label class="source"><input type="checkbox" ${selectedPast.has(i)?'checked':''} onchange="togglePast(${i},this.checked)"><div><b>${esc(x.title)}</b><p>${esc(x.rows.slice(0,5).map(r=>r.telop).filter(Boolean).join(' → '))}</p></div></label>`).join('');
+}
+function toggleKB(id,v){v?selectedKB.add(id):selectedKB.delete(id)}
+function togglePast(i,v){v?selectedPast.add(i):selectedPast.delete(i)}
+function shortFact(t,max=36){
+  t=String(t||'').replace(/と記載。?/g,'').replace(/旨の記載。?/g,'').replace(/する。$/,'');
+  const parts=t.split(/[。]/).filter(Boolean);
+  return (parts[0]||t).slice(0,max);
+}
+function genericVisual(i,assets,past){
+  const a=(assets||'').split(/[、,]/).map(x=>x.trim()).filter(Boolean);
+  const pv=past.flatMap(x=>x.rows.map(r=>r.visual)).filter(x=>x&&x!=='ー');
+  const pool=[...a,...pv,'スタッフがカメラに向かって説明','カタログ・資料の手元','モデルハウスの生活カット'];
+  return pool[i%pool.length]||'スタッフが説明';
+}
+function hookFor(angle,theme){
+  const hooks={
+    qa:[`${theme}、結局どうなの？`,`${theme}でよく聞かれる質問です`],
+    avoid:[`${theme}で後悔する人、ここを見落としがちです`,`${theme}、先にこれを知らないと後悔するかも`],
+    contrast:[`${theme}、実は「普通」に合わせなくていいです`,`${theme}で大事なのは、そこじゃありません`],
+    check:[`${theme}で確認したいポイント、3つです`,`${theme}、まずこの3つをチェック`],
+    story:[`${theme}がイメージできない方へ`,`${theme}、実際に見て初めて分かることがあります`],
+    pro:[`${theme}、住宅会社目線でシンプルに解説します`,`${theme}で迷ったら、まずここを見てください`]
+  }; return hooks[angle]?.[0]||hooks.pro[0];
+}
+function splitIntoCuts(text,max=18){
+  text=String(text||'').trim(); if(!text)return[];
+  const seg=text.split(/[、。]/).filter(Boolean);
+  let out=[];
+  seg.forEach(s=>{s=s.trim();while(s.length>max){let cut=Math.min(max,s.length);out.push(s.slice(0,cut));s=s.slice(cut)}if(s)out.push(s)});
+  return out;
+}
+function roleFor(i,total){if(i===0)return'フック';if(i<=2)return'続きを見る理由';if(i<total-3)return'情報・根拠';if(i===total-3)return'まとめ';return'締め'}
+function generate(){
+  const theme=document.getElementById('theme').value.trim();
+  if(!theme){alert('テーマを入力してください');return}
+  if(!selectedKB.size&&!selectedPast.size)autoPick();
+  const must=document.getElementById('must').value.trim();
+  const target=document.getElementById('target').value;
+  let angle=document.getElementById('angle').value;if(angle==='auto')angle=autoAngle(theme+' '+must);
+  const assets=document.getElementById('assets').value;
+  const cta=document.getElementById('cta').value;
+  const maxCuts=Number(document.getElementById('duration').value);
+  const kb=chosenKB(), past=chosenPast();
+  const cuts=[];
+  cuts.push({telop:hookFor(angle,theme),voice:hookFor(angle,theme).replace(/[！？?]/g,''),visual:genericVisual(0,assets,past)});
+  const bridge=angle==='avoid'?'知らずに進めると、あとで「想定と違った」になりやすいです':angle==='qa'?'結論から言うと、条件によって変わるのでポイントを分けて見ます':angle==='check'?'難しく考えず、この順番で見れば大丈夫です':angle==='contrast'?'数字や見た目だけで決める前に、暮らし方から考えるのがポイントです':'まず、判断材料を整理すると分かりやすいです';
+  splitIntoCuts(bridge).slice(0,2).forEach((x,j)=>cuts.push({telop:x,voice:x,visual:genericVisual(j+1,assets,past)}));
+  if(must){
+    splitIntoCuts(must,22).slice(0,3).forEach((x,j)=>cuts.push({telop:x,voice:x,visual:genericVisual(j+3,assets,past)}));
+  }
+  const facts=kb.slice(0,6).map(x=>({x,text:shortFact(x.text,46)}));
+  facts.forEach((f,j)=>{
+    let pieces=splitIntoCuts(f.text,22).slice(0,2);
+    pieces.forEach((p,k)=>cuts.push({telop:p,voice:p,visual:genericVisual(j+k+5,assets,past),source:f.x.title,verify:!!f.x.verify}));
+  });
+  if(cuts.length<8&&past.length){
+    const usable=past[0].rows.map(r=>r.telop).filter(x=>x&&x.length<30).slice(4,9);
+    usable.forEach((x,j)=>cuts.push({telop:x,voice:x,visual:genericVisual(j+8,assets,past)}));
+  }
+  cuts.push({telop:'大事なのは、自分たちの条件で確認すること',voice:'大事なのは、自分たちの条件に当てはめて確認することです',visual:genericVisual(15,assets,past)});
+  if(cta==='soft')cuts.push({telop:'迷っていることがあれば、まず整理するところから',voice:'まだ具体的に決まっていなくても、気になることから整理できます',visual:genericVisual(16,assets,past)});
+  if(cta==='profile')cuts.push({telop:'家づくり相談はプロフィールから',voice:'家づくりについて相談したい方は、プロフィールのリンクからご確認ください',visual:'Instagramプロフィール画面'});
+  if(cta==='next')cuts.push({telop:'次回も家づくりの疑問を解説します',voice:'次回も家づくりでよくある疑問を分かりやすく解説します',visual:'ロゴ・次回予告'});
+  let finalCuts=cuts.slice(0,maxCuts).map((c,i)=>({...c,cut:i+1,role:roleFor(i,Math.min(cuts.length,maxCuts))}));
+  const verify=kb.filter(x=>x.verify);
+  lastDraft={theme,target,angle,kb,past,cuts:finalCuts,verify,must,assets,cta};
+  renderResult();renderRefs();renderAI();
+  showTab('result');
+}
+function renderResult(){
+  const d=lastDraft;if(!d)return;
+  const rows=d.cuts.map(c=>`<tr><td class="cut">${c.cut}</td><td>${esc(c.telop)}${c.verify?'<br><span class="badge warn">要確認情報を含む</span>':''}</td><td>${esc(c.voice)}</td><td>${esc(c.visual)}</td><td class="role">${esc(c.role)}</td></tr>`).join('');
+  const warning=d.verify.length?`<div class="verify"><b>公開前に確認</b><br>${d.verify.map(x=>'・'+esc(x.title)).join('<br>')}</div>`:'';
+  document.getElementById('result').innerHTML=`<div class="stats"><span class="stat">テーマ：${esc(d.theme)}</span><span class="stat">見せ方：${esc(angleName(d.angle))}</span><span class="stat">CUT：${d.cuts.length}</span></div><div style="overflow:auto;margin-top:12px"><table><thead><tr><th>CUT</th><th>▼テロップ</th><th>▼アフレコ</th><th>▼撮影素材</th><th>役割</th></tr></thead><tbody>${rows}</tbody></table></div>${warning}<div class="actions"><button onclick="copyDraft()">台本をコピー</button></div>`;
+}
+function angleName(a){return({qa:'Q&A型',avoid:'失敗回避型',contrast:'思い込み反転型',check:'チェックリスト型',story:'ストーリー型',pro:'プロ解説型'})[a]||a}
+function renderRefs(){
+  const d=lastDraft;if(!d)return;
+  document.getElementById('refs').innerHTML=`<h3>事実の根拠（Q&A / 公式HP）</h3>${d.kb.map(x=>`<div class="refrow"><b>${esc(x.title)}</b> <span class="badge">${esc(x.source)}</span>${x.verify?'<span class="badge warn">要確認</span>':''}<br><span class="muted">${esc(x.text)}</span></div>`).join('')||'<p class="muted">なし</p>'}<h3>書き方の参考（過去台本）</h3>${d.past.map(x=>`<div class="refrow"><b>${esc(x.title)}</b><br><span class="muted">${esc(x.rows.slice(0,7).map(r=>r.telop).filter(Boolean).join(' → '))}</span></div>`).join('')||'<p class="muted">なし</p>'}<h3>編集ルール</h3><div class="box">${esc(CORRECTIONS.filter(x=>x.issue).slice(0,10).map(x=>'・'+x.issue+(x.improvement?' → '+x.improvement:'')).join('\n'))}</div>`;
+}
+function buildPrompt(){
+  const d=lastDraft;
+  const refScripts=d.past.map(x=>`【過去台本：${x.title}】\n${x.rows.slice(0,18).map(r=>`${r.cut}. テロップ:${r.telop} / アフレコ:${r.voice} / 撮影:${r.visual}`).join('\n')}`).join('\n\n');
+  const facts=d.kb.map(x=>`- [${x.source}${x.verify?'・要確認':''}] ${x.title}: ${x.text}`).join('\n');
+  const draft=d.cuts.map(c=>`${c.cut}. テロップ:${c.telop} / アフレコ:${c.voice} / 撮影:${c.visual}`).join('\n');
+  return `あなたは住宅会社WOODY HOUSEのInstagramリール台本編集者です。
+以下の「事実データ」と「過去台本の書き方」を使い、現在のたたき台を実務で使えるレベルに仕上げてください。
+
+【役割分担】
+- Q&A・公式HP = WHAT（会社固有の事実）。ここにない会社固有情報は創作しない。
+- 過去台本 = HOW（テンポ、CUTの刻み方、言い回し、撮影素材の考え方）。古い数値を事実として再利用しない。
+- 数値、価格、保証、補助金、施工エリア、キャンペーン等で「要確認」の情報は断定しない。
+
+【今回】
+テーマ：${d.theme}
+ターゲット：${d.target}
+見せ方：${angleName(d.angle)}
+必須内容：${d.must||'特になし'}
+撮影素材：${d.assets||'指定なし'}
+
+【会社情報】
+${facts}
+
+【過去台本】
+${refScripts}
+
+【現在のたたき台】
+${draft}
+
+【過去の修正方針】
+${CORRECTIONS.map(x=>'- '+x.issue+(x.improvement?' → '+x.improvement:'')).join('\n')}
+
+【仕上げルール】
+- 冒頭3秒を強くする。ただし煽りすぎない。
+- 1 CUT 1メッセージ。
+- テロップを短くする。
+- アフレコは資料の読み上げではなく自然な話し言葉。
+- 情報価値を先に置き、会社紹介・CTAは後半。
+- 商業臭を抑える。
+- 同じ意味を引き伸ばさない。
+- 撮影しやすい素材にする。
+- 誤字脱字を確認。
+- 最後に「公開前に確認すべき事実」を列挙。
+
+出力は「CUT / テロップ / アフレコ / 撮影素材」の表形式で。`;
+}
+function renderAI(){
+  document.getElementById('ai').innerHTML=`<p class="muted">ローカルで作ったたたき台を、ChatGPTやClaudeにこのプロンプトごと渡すと、会社情報と過去台本を踏まえて仕上げられます。</p><textarea id="aiPrompt" style="min-height:520px">${esc(buildPrompt())}</textarea><div class="actions"><button onclick="copyPrompt()">AI用プロンプトをコピー</button></div>`;
+}
+function copyDraft(){
+  const d=lastDraft;if(!d)return;
+  const t=d.cuts.map(c=>`CUT ${c.cut}\nテロップ：${c.telop}\nアフレコ：${c.voice}\n撮影素材：${c.visual}`).join('\n\n');
+  navigator.clipboard.writeText(t);alert('台本をコピーしました');
+}
+function copyPrompt(){navigator.clipboard.writeText(buildPrompt());alert('AI用プロンプトをコピーしました')}
+function renderDB(){
+  const cats=[...new Set(KB.map(x=>x.cat))];
+  document.getElementById('db').innerHTML=`<div class="stats"><span class="stat">会社情報 ${KB.length}件</span><span class="stat">過去台本 ${PAST.length}本</span><span class="stat">編集指摘 ${CORRECTIONS.length}件</span></div>`+cats.map(cat=>`<h3>${esc(cat)}</h3>${KB.filter(x=>x.cat===cat).map(x=>`<div class="refrow"><b>${esc(x.title)}</b> <span class="badge">${esc(x.source)}</span>${x.verify?'<span class="badge warn">要確認</span>':''}<br><span class="muted">${esc(x.text)}</span></div>`).join('')}`).join('')+`<h3>過去台本</h3>${PAST.map(x=>`<div class="refrow"><b>${esc(x.title)}</b> <span class="badge">${esc(x.sheet)}</span></div>`).join('')}`;
+}
+function showTab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.id===id))}
+document.querySelectorAll('.tab').forEach(x=>x.onclick=()=>showTab(x.dataset.tab));
+['theme','must'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{if(document.getElementById('theme').value.trim())renderPicks()}));
+renderDB();
+</script>
+</body>
+</html>
